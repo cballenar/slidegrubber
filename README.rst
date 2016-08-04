@@ -7,9 +7,10 @@ It uses the power of BeautifulSoup_, ImageMagick_ (through Wand_), and Requests_
 
 Requirements
 ------------
-You will need ImageMagick installed on your system to be able to do the image to pdf conversion.
+You will need ImageMagick installed on your system to be able to do the image-to-pdf conversion.
 
 .. code-block:: console
+
     $ apt-get install imagemagick
 
 
@@ -18,6 +19,7 @@ Usage
 You can simply pass the url as the only argument and it will download the pdf to the current working directory:
 
 .. code-block:: console
+
     >>> from slidegrubber import grub
     >>> grub('http://www.slideshare.net/author/my-slide')
     '/current_working_directory/my_slide-by-author.pdf'
@@ -25,6 +27,7 @@ You can simply pass the url as the only argument and it will download the pdf to
 Or you can specify where to download it:
 
 .. code-block:: console
+
     >>> from slidegrubber import grub
     >>> grub('http://www.slideshare.net/author/my-slide', '/my_local_path/my_slide.pdf')
     '/my_local_path/my_slide.pdf'
