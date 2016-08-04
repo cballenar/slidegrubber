@@ -1,7 +1,7 @@
 SlideGrubber
 ============
 
-Slidegrubber is a python package that can download SlideShare presentantions as PDF files.
+Slidegrubber is a python package that can download SlideShare presentations as PDF files.
 It uses the power of BeautifulSoup_, ImageMagick_ (through Wand_), and Requests_.
 
 
@@ -15,14 +15,14 @@ You will need ImageMagick installed on your system to be able to do the image to
 
 Usage
 -----
-You can simply pass the url as the only argument and it will download the pdf to the current working directory.
+You can simply pass the url as the only argument and it will download the pdf to the current working directory:
 
 .. code-block:: console
     >>> from slidegrubber import grub
     >>> grub('http://www.slideshare.net/author/my-slide')
     '/current_working_directory/my_slide-by-author.pdf'
 
-Or you can specify where to download
+Or you can specify where to download it:
 
 .. code-block:: console
     >>> from slidegrubber import grub
