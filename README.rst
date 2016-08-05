@@ -13,6 +13,13 @@ You will need ImageMagick installed on your system to be able to do the image-to
 
     $ apt-get install imagemagick
 
+Install
+-------
+Run the standard setup.py
+
+.. code-block:: console
+
+    $ python setup.py install
 
 Usage
 -----
