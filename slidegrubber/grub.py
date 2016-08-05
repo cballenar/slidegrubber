@@ -6,12 +6,17 @@ from requests import get
 from tempfile import mkdtemp
 from wand.image import Image
 from bs4 import BeautifulSoup
+from urlparse import urlparse
 # from socket import setdefaulttimeout
 
 def grub(url, output_path=None):
     """Perform complete grub operation."""
     # socket.setdefaulttimeout(20) # used to avoid extra long hangs. Is this necessary?
     OUTPUT_FORMAT = '.pdf'
+
+    # check url validity
+    if not check_url(url):
+        raise ValueError('The URL requested is not valid.')
 
     # use current working directory as default if no path is supplied
     if output_path == None:
@@ -60,6 +65,22 @@ def grub(url, output_path=None):
     finally:
         rmtree(dir_tmp)
 
+def check_url(url):
+    """Check if url is valid and return boolean."""
+    is_allowed = False
+    allowed_domains = set(['slideshare.net', 'www.slideshare.net', 'es.slideshare.net', 'pt.slideshare.net', 'de.slideshare.net', 'fr.slideshare.net'])
+
+    if ( isinstance(url, str) ):
+        url_parsed = urlparse(url)
+        for domain in allowed_domains:
+            if domain == url_parsed.netloc:
+                is_allowed = True
+
+        return is_allowed
+
+    else:
+        raise ValueError('URL must be a string.')
+
 def make_dir(directory_path):
     """Try to create directory, raise exception if unsuccessfull. """
     if directory_path != '':
@@ -71,9 +92,9 @@ def make_dir(directory_path):
 
 def get_slide_metadata(_url):
     """Parse url with regex and return author and title."""
-    url_parsed = search('(?:[^\/]*\/){3}([A-Za-z0-9-_\.]*)(?:\/)([A-Za-z0-9-_\.]*)', _url)
-    author = url_parsed.group(1)
-    title = url_parsed.group(2)
+    match = search('(?:[^\/]*\/){3}([A-Za-z0-9-_\.]*)(?:\/)([A-Za-z0-9-_\.]*)', _url)
+    author = match.group(1)
+    title = match.group(2)
 
     return author, title
 
