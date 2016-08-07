@@ -36,8 +36,7 @@ def grub(url, output_path=None):
 
     # if no output filename, build from url
     if output_file == '':
-        author, title = get_slide_metadata(url)
-        output_file = '{}-by-{}{}'.format(title, author, OUTPUT_FORMAT)
+        output_file = get_filename(url, OUTPUT_FORMAT)
 
     # else check filename for correct format
     elif output_file[-4:] != OUTPUT_FORMAT:
@@ -90,13 +89,12 @@ def make_dir(directory_path):
             if not os.path.isdir(directory_path):
                 raise
 
-def get_slide_metadata(_url):
-    """Parse url with regex and return author and title."""
-    match = search('(?:[^\/]*\/){3}([A-Za-z0-9-_\.]*)(?:\/)([A-Za-z0-9-_\.]*)', _url)
-    author = match.group(1)
-    title = match.group(2)
+def get_filename(url, OUTPUT_FORMAT):
+    """Parse url with regex and return the formatted filename."""
+    match = search('(?:[^\/]*\/){3}([A-Za-z0-9-_\.]*)(?:\/)([A-Za-z0-9-_\.]*)', url)
+    filename = '{}-by-{}{}'.format(match.group(2), match.group(1), OUTPUT_FORMAT)
 
-    return author, title
+    return filename
 
 def download_image(file_remote, file_local):
     """Download image blob and save with Wand."""
