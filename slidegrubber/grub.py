@@ -15,6 +15,7 @@ class SlideGrubber(object):
     soup = None
     title = None
     author = None
+    output_path = None
 
     def __init__(self, url):
         # socket.setdefaulttimeout(20) # used to avoid extra long hangs. Is this necessary?
@@ -39,7 +40,7 @@ class SlideGrubber(object):
 
     def grub(self, output_path=None):
         """Perform complete grub operation."""
-        output_path = self.check_output(output_path)
+        self.output_path = self.check_output(output_path)
 
         # get the slides img tags
         slides_markup = self.soup.find_all('img', attrs={'class': 'slide_image'})
@@ -49,7 +50,7 @@ class SlideGrubber(object):
         dir_tmp = mkdtemp()
         try:
             slides_downloaded = self.get_slides(slides_markup, resolution, dir_tmp)
-            file_output = self.convert_to_pdf(slides_downloaded, output_path)
+            file_output = self.convert_to_pdf(slides_downloaded, self.output_path)
 
             return file_output
 

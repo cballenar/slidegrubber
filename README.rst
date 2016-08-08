@@ -31,7 +31,7 @@ You can pass the url to initialize the class and then call grub() to download th
     >>> s = SlideGrubber('http://www.slideshare.net/author/my-slide')
     Your presentation My Slide by author is ready for processing.
     >>> s.grub()
-    '/current_working_directory/my_slide-by-author.pdf'
+    '/current_working_directory/my-slide-by-author.pdf'
 
 If no filename or path is specified the presentation will be downloaded to the current working directory using the url to build the name. But you can also specify the output path, like so:
 
@@ -40,7 +40,7 @@ If no filename or path is specified the presentation will be downloaded to the c
     >>> s.grub('/my_local_path/my_slide.pdf')
     '/my_local_path/my_slide.pdf'
 
-You can get additional information such as the title and author of the slide:
+You can get additional information such as the title, author, and processed output path after the presentation has been downloaded:
 
 .. code-block:: console
 
@@ -49,6 +49,9 @@ You can get additional information such as the title and author of the slide:
 
     >>> s.author
     u'The Author'
+
+    >>> s.output_path
+    u'/current_working_directory/my-slide-by-author.pdf'
 
 
 .. _BeautifulSoup: https://www.crummy.com/software/BeautifulSoup/bs4/
