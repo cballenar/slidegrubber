@@ -40,7 +40,7 @@ If no filename or path is specified the presentation will be downloaded to the c
     >>> s.grub('/my_local_path/my_slide.pdf')
     '/my_local_path/my_slide.pdf'
 
-You can get additional information such as the title, author, and processed output path after the presentation has been downloaded:
+You can get additional information such as the title, author, and processed output path, directory, and filename after the presentation has been downloaded:
 
 .. code-block:: console
 
@@ -49,6 +49,12 @@ You can get additional information such as the title, author, and processed outp
 
     >>> s.author
     u'The Author'
+
+    >>> s.output_dir
+    u'/current_working_directory/'
+
+    >>> s.output_filename
+    u'my-slide-by-author.pdf'
 
     >>> s.output_path
     u'/current_working_directory/my-slide-by-author.pdf'

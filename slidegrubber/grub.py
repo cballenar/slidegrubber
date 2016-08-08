@@ -15,7 +15,9 @@ class SlideGrubber(object):
     soup = None
     title = None
     author = None
+    output_dir = None
     output_path = None
+    output_filename = None
 
     def __init__(self, url):
         # socket.setdefaulttimeout(20) # used to avoid extra long hangs. Is this necessary?
@@ -40,7 +42,8 @@ class SlideGrubber(object):
 
     def grub(self, output_path=None):
         """Perform complete grub operation."""
-        self.output_path = self.check_output(output_path)
+        # check for an output_path and build if incomplete or not available
+        self.set_output(output_path)
 
         # get the slides img tags
         slides_markup = self.soup.find_all('img', attrs={'class': 'slide_image'})
@@ -89,7 +92,8 @@ class SlideGrubber(object):
 
         return filename
 
-    def check_output(self, output_path):
+    def set_output(self, output_path):
+        """Sets output_path, output_dir, and output_filename. It takes a path string as an argument and completes it if necessary."""
         # if no path is supplied set to empty string
         if output_path == None:
             output_path = ''
@@ -115,7 +119,10 @@ class SlideGrubber(object):
         # rebuild output path
         output_path = os.path.join(output_dir, output_file)
 
-        return output_path
+        # set output properties
+        self.output_dir = output_dir
+        self.output_filename = output_file
+        self.output_path = output_path
 
     def download_image(self, file_remote, file_local):
         """Download image blob and save with Wand."""
