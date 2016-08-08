@@ -23,21 +23,33 @@ Run the standard setup.py
 
 Usage
 -----
-You can simply pass the url as the only argument and it will download the pdf to the current working directory:
+You can pass the url to initialize the class and then call grub() to download the presentation to a pdf file.
 
 .. code-block:: console
 
-    >>> from slidegrubber import grub
-    >>> grub('http://www.slideshare.net/author/my-slide')
+    >>> from slidegrubber import SlideGrubber
+    >>> s = SlideGrubber('http://www.slideshare.net/author/my-slide')
+    Your presentation My Slide by author is ready for processing.
+    >>> s.grub()
     '/current_working_directory/my_slide-by-author.pdf'
 
-Or you can specify where to download it:
+If no filename or path is specified the presentation will be downloaded to the current working directory using the url to build the name. But you can also specify the output path, like so:
 
 .. code-block:: console
 
-    >>> from slidegrubber import grub
-    >>> grub('http://www.slideshare.net/author/my-slide', '/my_local_path/my_slide.pdf')
+    >>> s.grub('/my_local_path/my_slide.pdf')
     '/my_local_path/my_slide.pdf'
+
+You can get additional information such as the title and author of the slide:
+
+.. code-block:: console
+
+    >>> s.title
+    u'My Slide'
+
+    >>> s.author
+    u'The Author'
+
 
 .. _BeautifulSoup: https://www.crummy.com/software/BeautifulSoup/bs4/
 .. _ImageMagick: http://www.imagemagick.org/

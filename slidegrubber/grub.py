@@ -9,155 +9,175 @@ from bs4 import BeautifulSoup
 from urlparse import urlparse
 # from socket import setdefaulttimeout
 
-def grub(url, output_path=None):
-    """Perform complete grub operation."""
-    # socket.setdefaulttimeout(20) # used to avoid extra long hangs. Is this necessary?
+class SlideGrubber(object):
     OUTPUT_FORMAT = '.pdf'
+    url = None
+    soup = None
+    title = None
+    author = None
 
-    # check url validity
-    if not check_url(url):
-        raise ValueError('The URL requested is not valid.')
+    def __init__(self, url):
+        # socket.setdefaulttimeout(20) # used to avoid extra long hangs. Is this necessary?
 
-    # use current working directory as default if no path is supplied
-    if output_path == None:
-        output_dir = os.getcwd()
-        output_file = ''
+        # check url validity
+        if not self.check_url(url):
+            raise ValueError('The URL requested is not valid.')
 
-    # else split for testing
-    else:
-        output_dir, output_file = os.path.split(output_path)
+        self.url = url
 
-    # create directory
-    make_dir(output_dir)
+        # get html and soup it up
+        html = self.get_html(url)
+        self.soup = BeautifulSoup(html.text, 'html.parser')
 
-    # if no output directory, use current one
-    if output_dir == '':
-        output_dir = os.getcwd()
+        # get slide title and author from soup
+        self.title = self.soup.head.title.string[0:59]
+        self.author = self.soup.find(attrs={'class':'slideshow-info'}).find('h2').find(attrs={'itemprop':'name'}).string
 
-    # if no output filename, build from url
-    if output_file == '':
-        output_file = get_filename(url, OUTPUT_FORMAT)
+        # return info upon success
+        print 'Your presentation {} by {} is ready for processing.'.format(self.title, self.author)
 
-    # else check filename for correct format
-    elif output_file[-4:] != OUTPUT_FORMAT:
-        output_file = '{}{}'.format(output_file, OUTPUT_FORMAT)
 
-    # rebuild output path
-    output_path = os.path.join(output_dir, output_file)
+    def grub(self, output_path=None):
+        """Perform complete grub operation."""
+        output_path = self.check_output(output_path)
 
-    # get html and soup it up
-    html = get_html(url)
-    soup = BeautifulSoup(html.text, 'html.parser')
+        # get the slides img tags
+        slides_markup = self.soup.find_all('img', attrs={'class': 'slide_image'})
+        resolution = self.get_best_resolution(slides_markup)
 
-    # get the slides img tags
-    slides_markup = soup.find_all('img', attrs={'class': 'slide_image'})
-    resolution = get_best_resolution(slides_markup)
-
-    # download images from markup array
-    dir_tmp = mkdtemp()
-    try:
-        slides_downloaded = get_slides(slides_markup, resolution, dir_tmp)
-        file_output = convert_to_pdf(slides_downloaded, output_path)
-
-        return file_output
-
-    finally:
-        rmtree(dir_tmp)
-
-def check_url(url):
-    """Check if url is valid and return boolean."""
-    is_allowed = False
-    allowed_domains = set(['slideshare.net', 'www.slideshare.net', 'es.slideshare.net', 'pt.slideshare.net', 'de.slideshare.net', 'fr.slideshare.net'])
-
-    if ( isinstance(url, str) ):
-        url_parsed = urlparse(url)
-        for domain in allowed_domains:
-            if domain == url_parsed.netloc:
-                is_allowed = True
-
-        return is_allowed
-
-    else:
-        raise ValueError('URL must be a string.')
-
-def make_dir(directory_path):
-    """Try to create directory, raise exception if unsuccessfull. """
-    if directory_path != '':
+        # download images from markup array
+        dir_tmp = mkdtemp()
         try:
-            os.makedirs(directory_path)
-        except OSError:
-            if not os.path.isdir(directory_path):
-                raise
+            slides_downloaded = self.get_slides(slides_markup, resolution, dir_tmp)
+            file_output = self.convert_to_pdf(slides_downloaded, output_path)
 
-def get_filename(url, OUTPUT_FORMAT):
-    """Parse url with regex and return the formatted filename."""
-    match = search('(?:[^\/]*\/){3}([A-Za-z0-9-_\.]*)(?:\/)([A-Za-z0-9-_\.]*)', url)
-    filename = '{}-by-{}{}'.format(match.group(2), match.group(1), OUTPUT_FORMAT)
+            return file_output
 
-    return filename
+        finally:
+            rmtree(dir_tmp)
 
-def download_image(file_remote, file_local):
-    """Download image blob and save with Wand."""
-    r = get(file_remote, stream=True)
-    if r.status_code == 200:
-        # use wand to save file
-        with Image(blob=r) as img:
-            img.save(filename=file_local)
-    else:
-        r.raise_for_status
+    def check_url(self, url):
+        """Check if url is valid and return boolean."""
+        is_allowed = False
+        allowed_domains = set(['slideshare.net', 'www.slideshare.net', 'es.slideshare.net', 'pt.slideshare.net', 'de.slideshare.net', 'fr.slideshare.net'])
 
-def get_html(url):
-    """Get raw html."""
-    html = get(url)
-    html.raise_for_status()
+        if ( isinstance(url, str) ):
+            url_parsed = urlparse(url)
+            for domain in allowed_domains:
+                if domain == url_parsed.netloc:
+                    is_allowed = True
 
-    return html
-
-def get_best_resolution(slides_markup):
-    """Find best resolution available in markup."""
-    resolution = None
-
-    if slides_markup[0].has_attr('data-full'):
-        resolution = 'data-full'
-
-    elif slides_markup[0].has_attr('data-normal'):
-        resolution = 'data-normal'
-
-    else:
-        raise Exception('No appropriate resolution found')
-
-    return resolution
-
-def get_slides(slides_markup, resolution, directory):
-    """Download images from array to a temporary directory."""
-    slides_downloaded = []
-    for i, image in enumerate(slides_markup, start=1):
-        # form slides data
-        file_remote = image[resolution]
-        file_local = os.path.join(directory, 'slide-{}.jpg'.format(str(i)))
-
-        try:
-            download_image(file_remote, file_local)
-
-        except Exception, e:
-            # cleanup and terminate
-            rmtree(directory)
-            raise Exception('Unable to download image {} to location {}. Error: {}'.format(file_remote, file_local, e))
+            return is_allowed
 
         else:
-            # add to array
-            slides_downloaded.append(file_local)
+            raise ValueError('URL must be a string.')
 
-    return slides_downloaded
+    def make_dir(self, directory_path):
+        """Try to create directory, raise exception if unsuccessfull. """
+        if directory_path != '':
+            try:
+                os.makedirs(directory_path)
+            except OSError:
+                if not os.path.isdir(directory_path):
+                    raise
 
+    def get_filename(self):
+        """Parse url with regex and return the formatted filename."""
+        match = search('(?:[^\/]*\/){3}([A-Za-z0-9-_\.]*)(?:\/)([A-Za-z0-9-_\.]*)', self.url)
+        filename = '{}-by-{}'.format(match.group(2), match.group(1))
 
-def convert_to_pdf(slides_downloaded, output_path):
-    """Convert images in array to pdf using output_path."""
-    with Image() as wand:
-        for image_path in slides_downloaded:
-            with Image(filename=image_path) as page:
-                wand.sequence.append(page)
+        return filename
 
-        wand.save(filename=output_path)
+    def check_output(self, output_path):
+        # if no path is supplied set to empty string
+        if output_path == None:
+            output_path = ''
+
+        # split for testing
+        output_dir, output_file = os.path.split(output_path)
+
+        # if no output directory, use current one
+        if output_dir == '':
+            output_dir = os.getcwd()
+
+        # if no output filename, build from url
+        if output_file == '':
+            output_file = self.get_filename()
+
+        # check filename for correct format
+        if output_file[-4:] != self.OUTPUT_FORMAT:
+            output_file = '{}{}'.format(output_file, self.OUTPUT_FORMAT)
+
+        # create directory
+        self.make_dir(output_dir)
+
+        # rebuild output path
+        output_path = os.path.join(output_dir, output_file)
 
         return output_path
+
+    def download_image(self, file_remote, file_local):
+        """Download image blob and save with Wand."""
+        r = get(file_remote, stream=True)
+        if r.status_code == 200:
+            # use wand to save file
+            with Image(blob=r) as img:
+                img.save(filename=file_local)
+        else:
+            r.raise_for_status
+
+    def get_html(self, url):
+        """Get raw html."""
+        html = get(url)
+        html.raise_for_status()
+
+        return html
+
+    def get_best_resolution(self, slides_markup):
+        """Find best resolution available in markup."""
+        resolution = None
+
+        if slides_markup[0].has_attr('data-full'):
+            resolution = 'data-full'
+
+        elif slides_markup[0].has_attr('data-normal'):
+            resolution = 'data-normal'
+
+        else:
+            raise Exception('No appropriate resolution found')
+
+        return resolution
+
+    def get_slides(self, slides_markup, resolution, directory):
+        """Download images from array to a temporary directory."""
+        slides_downloaded = []
+        for i, image in enumerate(slides_markup, start=1):
+            # form slides data
+            file_remote = image[resolution]
+            file_local = os.path.join(directory, 'slide-{}.jpg'.format(str(i)))
+
+            try:
+                self.download_image(file_remote, file_local)
+
+            except Exception, e:
+                # cleanup and terminate
+                rmtree(directory)
+                raise Exception('Unable to download image {} to location {}. Error: {}'.format(file_remote, file_local, e))
+
+            else:
+                # add to array
+                slides_downloaded.append(file_local)
+
+        return slides_downloaded
+
+
+    def convert_to_pdf(self, slides_downloaded, output_path):
+        """Convert images in array to pdf using output_path."""
+        with Image() as wand:
+            for image_path in slides_downloaded:
+                with Image(filename=image_path) as page:
+                    wand.sequence.append(page)
+
+            wand.save(filename=output_path)
+
+            return output_path
