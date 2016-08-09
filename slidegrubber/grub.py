@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import os
+import logging
 from re import search
 from shutil import rmtree
 from requests import get
@@ -21,6 +22,8 @@ class SlideGrubber(object):
     slides_markup = None
 
     def __init__(self, url):
+        logging.info('Initializing with %s', url)
+
         # socket.setdefaulttimeout(20) # used to avoid extra long hangs. Is this necessary?
 
         # check url validity
@@ -46,6 +49,8 @@ class SlideGrubber(object):
 
     def grub(self, output_path=None, slides_markup=None):
         """Perform complete grub operation."""
+        logging.info('Checking grub() arguments')
+
         # check if slides_markup is available, otherwise use entire slides_markup by default
         if (slides_markup == None):
             slides_markup = self.slides_markup
@@ -55,6 +60,8 @@ class SlideGrubber(object):
 
         # get best resolution available in array
         resolution = self.get_best_resolution(slides_markup)
+
+        logging.info('Grubbing %s slides to %s', len(slides_markup), output_path)
 
         # download images from markup array
         dir_tmp = mkdtemp()
@@ -69,6 +76,8 @@ class SlideGrubber(object):
 
     def check_url(self, url):
         """Check if url is valid and return boolean."""
+        logging.info('Checking url %s', url)
+
         is_allowed = False
         allowed_domains = set(['slideshare.net', 'www.slideshare.net', 'es.slideshare.net', 'pt.slideshare.net', 'de.slideshare.net', 'fr.slideshare.net'])
 
@@ -85,6 +94,8 @@ class SlideGrubber(object):
 
     def make_dir(self, directory_path):
         """Try to create directory, raise exception if unsuccessfull. """
+        logging.info('Making directory %s', directory_path)
+
         if directory_path != '':
             try:
                 os.makedirs(directory_path)
@@ -94,6 +105,8 @@ class SlideGrubber(object):
 
     def get_filename(self):
         """Parse url with regex and return the formatted filename."""
+        logging.info('Getting filename from url %s', url)
+
         match = search('(?:[^\/]*\/){3}([A-Za-z0-9-_\.]*)(?:\/)([A-Za-z0-9-_\.]*)', self.url)
         filename = '{}-by-{}'.format(match.group(2), match.group(1))
 
@@ -102,6 +115,8 @@ class SlideGrubber(object):
     def set_output(self, output_path):
         """Sets output_path, output_dir, and output_filename. It takes a path string as an argument and completes it if necessary."""
         # if no path is supplied set to empty string
+        logging.info('Checking and setting correct output %s', url)
+
         if output_path == None:
             output_path = ''
 
@@ -133,6 +148,8 @@ class SlideGrubber(object):
 
     def download_image(self, file_remote, file_local):
         """Download image blob and save with Wand."""
+        logging.info('Downloading image %s to %s', file_remote, file_local)
+
         r = get(file_remote, stream=True)
         if r.status_code == 200:
             # use wand to save file
@@ -143,6 +160,8 @@ class SlideGrubber(object):
 
     def get_html(self, url):
         """Get raw html."""
+        logging.info('Getting html from %s', url)
+
         html = get(url)
         html.raise_for_status()
 
@@ -150,6 +169,8 @@ class SlideGrubber(object):
 
     def get_best_resolution(self, slides_markup):
         """Find best resolution available in markup."""
+        logging.info('Getting best resolution available')
+
         resolution = None
 
         if slides_markup[0].has_attr('data-full'):
@@ -161,10 +182,14 @@ class SlideGrubber(object):
         else:
             raise Exception('No appropriate resolution found')
 
+        logging.info('The best resolution available is %s', resolution)
+
         return resolution
 
     def get_slides(self, slides_markup, resolution, directory):
         """Download images from array to a temporary directory."""
+        logging.info('Getting slides from markup using resolution %s to %s', resolution, directory)
+
         slides_downloaded = []
         for i, image in enumerate(slides_markup, start=1):
             # form slides data
@@ -188,6 +213,8 @@ class SlideGrubber(object):
 
     def convert_to_pdf(self, slides_downloaded, output_path):
         """Convert images in array to pdf using output_path."""
+        logging.info('Converting %s slides to pdf and saving to %s', len(slides_downloaded), output_path)
+
         with Image() as wand:
             for image_path in slides_downloaded:
                 with Image(filename=image_path) as page:

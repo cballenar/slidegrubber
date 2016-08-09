@@ -72,6 +72,10 @@ The slides markup can also be accessed as a property and you can pass the images
     u'/current_working_directory/my-slide-by-author.pdf'
 
 
+Logging
+-------
+v2.4 fills SlideGrubber with log messages. This should be looked at more carefully...
+
 .. _BeautifulSoup: https://www.crummy.com/software/BeautifulSoup/bs4/
 .. _ImageMagick: http://www.imagemagick.org/
 .. _Wand: http://wand-py.org/
