@@ -105,7 +105,7 @@ class SlideGrubber(object):
 
     def get_filename(self):
         """Parse url with regex and return the formatted filename."""
-        logging.info('Getting filename from url %s', url)
+        logging.info('Getting filename from url')
 
         match = search('(?:[^\/]*\/){3}([A-Za-z0-9-_\.]*)(?:\/)([A-Za-z0-9-_\.]*)', self.url)
         filename = '{}-by-{}'.format(match.group(2), match.group(1))
@@ -114,9 +114,9 @@ class SlideGrubber(object):
 
     def set_output(self, output_path):
         """Sets output_path, output_dir, and output_filename. It takes a path string as an argument and completes it if necessary."""
-        # if no path is supplied set to empty string
-        logging.info('Checking and setting correct output %s', url)
+        logging.info('Checking and setting correct output based on %s', output_path)
 
+        # if no path is supplied set to empty string
         if output_path == None:
             output_path = ''
 
@@ -127,6 +127,8 @@ class SlideGrubber(object):
         if output_dir == '':
             output_dir = os.getcwd()
 
+        logging.info('Final output directory is %s', output_dir)
+
         # if no output filename, build from url
         if output_file == '':
             output_file = self.get_filename()
@@ -135,11 +137,15 @@ class SlideGrubber(object):
         if output_file[-4:] != self.OUTPUT_FORMAT:
             output_file = '{}{}'.format(output_file, self.OUTPUT_FORMAT)
 
+        logging.info('Final output file is %s', output_file)
+
         # create directory
         self.make_dir(output_dir)
 
         # rebuild output path
         output_path = os.path.join(output_dir, output_file)
+
+        logging.info('Final output path is %s', output_path)
 
         # set output properties
         self.output_dir = output_dir
