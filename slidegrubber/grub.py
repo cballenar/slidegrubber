@@ -18,6 +18,7 @@ class SlideGrubber(object):
     output_dir = None
     output_path = None
     output_filename = None
+    slides_markup = None
 
     def __init__(self, url):
         # socket.setdefaulttimeout(20) # used to avoid extra long hangs. Is this necessary?
@@ -36,17 +37,23 @@ class SlideGrubber(object):
         self.title = self.soup.head.title.string[0:59]
         self.author = self.soup.find(attrs={'class':'slideshow-info'}).find('h2').find(attrs={'itemprop':'name'}).string
 
+        # get array of slides img tags
+        self.slides_markup = self.soup.find_all('img', attrs={'class': 'slide_image'})
+
         # return info upon success
         print 'Your presentation {} by {} is ready for processing.'.format(self.title, self.author)
 
 
-    def grub(self, output_path=None):
+    def grub(self, output_path=None, slides_markup=None):
         """Perform complete grub operation."""
+        # check if slides_markup is available, otherwise use entire slides_markup by default
+        if (slides_markup == None):
+            slides_markup = self.slides_markup
+
         # check for an output_path and build if incomplete or not available
         self.set_output(output_path)
 
-        # get the slides img tags
-        slides_markup = self.soup.find_all('img', attrs={'class': 'slide_image'})
+        # get best resolution available in array
         resolution = self.get_best_resolution(slides_markup)
 
         # download images from markup array
