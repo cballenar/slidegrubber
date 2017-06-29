@@ -37,8 +37,8 @@ class SlideGrubber(object):
         self.soup = BeautifulSoup(html.text, 'html.parser')
 
         # get slide title and author from soup
-        self.title = self.soup.head.title.string[0:59]
-        self.author = self.soup.find(attrs={'class':'slideshow-info'}).find('h2').find(attrs={'itemprop':'name'}).string
+        self.title = self.get_title(self.soup)
+        self.author = self.get_author(self.soup)
 
         # get array of slides img tags
         self.slides_markup = self.get_slides_markup(self.soup)
@@ -172,6 +172,18 @@ class SlideGrubber(object):
         html.raise_for_status()
 
         return html
+
+    def get_title(self, soup):
+        """Inspect HTML soup for the title of the presentation."""
+        title = self.soup.head.title.string[0:59]
+
+        return title
+
+    def get_author(self, soup):
+        """Inspect HTML soup for the author of the presentation."""
+        author = soup.find(attrs={'class':'slideshow-info'}).find('h2').find(attrs={'itemprop':'name'}).string
+
+        return author
 
     def get_slides_markup(self, soup):
         """Inspect HTML soup for the markup of each slide and append to list."""
