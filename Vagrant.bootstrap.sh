@@ -6,3 +6,6 @@ pip install virtualenv
 # setup virtual environment
 cd /vagrant/
 virtualenv venv
+
+# install slidegrubber
+python setup.py install
