@@ -41,7 +41,7 @@ class SlideGrubber(object):
         self.author = self.soup.find(attrs={'class':'slideshow-info'}).find('h2').find(attrs={'itemprop':'name'}).string
 
         # get array of slides img tags
-        self.slides_markup = self.soup.find_all('img', attrs={'class': 'slide_image'})
+        self.slides_markup = self.get_slides_markup(self.soup)
 
         # return info upon success
         print 'Your presentation {} by {} is ready for processing.'.format(self.title, self.author)
@@ -172,6 +172,15 @@ class SlideGrubber(object):
         html.raise_for_status()
 
         return html
+
+    def get_slides_markup(self, soup):
+        """Inspect HTML soup for the markup of each slide and append to list."""
+        slides_markup = soup.find_all('img', attrs={'class': 'slide_image'})
+
+        if not slides_markup:
+            raise Exception('Dynamic slides are not supported')
+
+        return slides_markup
 
     def get_best_resolution(self, slides_markup):
         """Find best resolution available in markup."""
