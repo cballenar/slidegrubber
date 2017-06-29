@@ -1,7 +1,7 @@
 SlideGrubber
 ============
 
-Slidegrubber is a python package that can download SlideShare presentations as PDF files.
+SlideGrubber is a python package that can download SlideShare presentations as PDF files.
 It uses the power of BeautifulSoup_, ImageMagick_ (through Wand_), and Requests_.
 
 
