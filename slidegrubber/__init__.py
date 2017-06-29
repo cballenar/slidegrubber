@@ -1,2 +1,2 @@
 #!/usr/bin/env python
-from .grub import grub
+from .grub import SlideGrubber
