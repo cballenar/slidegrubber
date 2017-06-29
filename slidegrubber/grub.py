@@ -16,9 +16,7 @@ class SlideGrubber(object):
     soup = None
     title = None
     author = None
-    output_dir = None
     output_path = None
-    output_filename = None
     slides_markup = None
 
     def __init__(self, url):
@@ -113,7 +111,7 @@ class SlideGrubber(object):
         return filename
 
     def set_output(self, output_path):
-        """Sets output_path, output_dir, and output_filename. It takes a path string as an argument and completes it if necessary."""
+        """Sets output_path. It takes a path string as an argument and completes it if necessary."""
         logging.info('Checking and setting correct output based on %s', output_path)
 
         # if no path is supplied set to empty string
@@ -148,8 +146,6 @@ class SlideGrubber(object):
         logging.info('Final output path is %s', output_path)
 
         # set output properties
-        self.output_dir = output_dir
-        self.output_filename = output_file
         self.output_path = output_path
 
     def download_image(self, file_remote, file_local):
