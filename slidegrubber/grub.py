@@ -173,13 +173,13 @@ class SlideGrubber(object):
         """Inspect HTML soup for the title of the presentation."""
         title = self.soup.head.title.string[0:59]
 
-        return title
+        return title.encode('utf-8')
 
     def get_author(self, soup):
         """Inspect HTML soup for the author of the presentation."""
         author = soup.find(attrs={'class':'slideshow-info'}).find('h2').find(attrs={'itemprop':'name'}).string
 
-        return author
+        return author.encode('utf-8')
 
     def get_slides_markup(self, soup):
         """Inspect HTML soup for the markup of each slide and append to list."""
