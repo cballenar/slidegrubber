@@ -16,6 +16,7 @@ class SlideGrubber(object):
     soup = None
     title = None
     author = None
+    filename = None
     output_path = None
     slides_markup = None
 
@@ -37,6 +38,7 @@ class SlideGrubber(object):
         # get slide title and author from soup
         self.title = self.get_title(self.soup)
         self.author = self.get_author(self.soup)
+        self.filename = self.get_filename(self.soup)
 
         # get array of slides img tags
         self.slides_markup = self.get_slides_markup(self.soup)
@@ -129,7 +131,7 @@ class SlideGrubber(object):
 
         # if no output filename, build from url
         if output_file == '':
-            output_file = self.get_filename()
+            output_file = self.filename
 
         # check filename for correct format
         if output_file[-4:] != self.OUTPUT_FORMAT:

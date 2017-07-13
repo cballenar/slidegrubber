@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name='slidegrubber',
-    version='2.5.1',
+    version='2.6',
     description='Back up your SlideShare presentations to PDF.',
     classifiers=[
         'Development Status :: 5 - Production/Stable',
