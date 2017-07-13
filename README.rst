@@ -50,8 +50,8 @@ You can get additional information such as the title, author, and (after the pre
     >>> s.author
     u'The Author'
 
-    >>> s.output_path
-    u'/current_working_directory/my-slide-by-author.pdf'
+    >>> s.filename
+    u'my-slide-by-author'
 
 The slides markup can also be accessed as a property and you can pass the images markup to grub() as a second argument to specify what images to convert to pdf. This is helpful if you only need a fraction of the images but it requires more work.
 
