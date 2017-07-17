@@ -38,7 +38,7 @@ class SlideGrubber(object):
         # get slide title and author from soup
         self.title = self.get_title(self.soup)
         self.author = self.get_author(self.soup)
-        self.filename = self.get_filename(self.soup)
+        self.filename = self.get_filename(self.url)
 
         # get array of slides img tags
         self.slides_markup = self.get_slides_markup(self.soup)
@@ -103,11 +103,11 @@ class SlideGrubber(object):
                 if not os.path.isdir(directory_path):
                     raise
 
-    def get_filename(self):
+    def get_filename(self, url):
         """Parse url with regex and return the formatted filename."""
         logging.info('Getting filename from url')
 
-        match = search('(?:[^\/]*\/){3}([A-Za-z0-9-_\.]*)(?:\/)([A-Za-z0-9-_\.]*)', self.url)
+        match = search('(?:[^\/]*\/){3}([A-Za-z0-9-_\.]*)(?:\/)([A-Za-z0-9-_\.]*)', url)
         filename = '{}-by-{}'.format(match.group(2), match.group(1))
 
         return filename
