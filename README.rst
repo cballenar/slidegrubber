@@ -55,6 +55,8 @@ You can get additional information such as the title, author, and (after the pre
 
 The slides markup can also be accessed as a property and you can pass the images markup to grub() as a second argument to specify what images to convert to pdf. This is helpful if you only need a fraction of the images but it requires more work.
 
+As of v2.7, the slides are now sorted.
+
 .. code-block:: console
 
     >>> # get entire markup
