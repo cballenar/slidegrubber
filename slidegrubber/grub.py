@@ -190,7 +190,12 @@ class SlideGrubber(object):
         if not slides_markup:
             raise Exception('Dynamic slides are not supported')
 
-        return slides_markup
+        sorted_slides_markup = []
+        for slide in slides_markup:
+            n = int(slide.parent['data-index'])-1
+            sorted_slides_markup.insert(n, slide)
+
+        return sorted_slides_markup
 
     def get_best_resolution(self, slides_markup):
         """Find best resolution available in markup."""
