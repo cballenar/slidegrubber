@@ -188,7 +188,7 @@ class SlideGrubber(object):
         slides_markup = soup.find_all('img', attrs={'class': 'slide_image'})
 
         if not slides_markup:
-            raise Exception('Dynamic slides are not supported')
+            raise TypeError('Dynamic slides are not supported')
 
         sorted_slides_markup = []
         for slide in slides_markup:
