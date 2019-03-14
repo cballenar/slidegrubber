@@ -7,7 +7,12 @@ from requests import get
 from tempfile import mkdtemp
 from wand.image import Image
 from bs4 import BeautifulSoup
-from urlparse import urlparse
+try:
+    # Python 3
+    from urllib.parse import urlparse
+except ImportError:
+    # Python 2
+    from urlparse import urlparse
 # from socket import setdefaulttimeout
 
 class SlideGrubber(object):
@@ -44,7 +49,7 @@ class SlideGrubber(object):
         self.slides_markup = self.get_slides_markup(self.soup)
 
         # return info upon success
-        print 'Your presentation {} by {} is ready for processing.'.format(self.title, self.author)
+        print('Your presentation "{}" by "{}" is ready for processing.'.format(self.title, self.author))
 
 
     def grub(self, output_path=None, slides_markup=None):
@@ -175,13 +180,13 @@ class SlideGrubber(object):
         """Inspect HTML soup for the title of the presentation."""
         title = self.soup.head.title.string[0:59]
 
-        return title.encode('utf-8')
+        return title
 
     def get_author(self, soup):
         """Inspect HTML soup for the author of the presentation."""
         author = soup.find(attrs={'class':'slideshow-info'}).find('h2').find(attrs={'itemprop':'name'}).string
 
-        return author.encode('utf-8')
+        return author
 
     def get_slides_markup(self, soup):
         """Inspect HTML soup for the markup of each slide and append to list."""
@@ -229,7 +234,7 @@ class SlideGrubber(object):
             try:
                 self.download_image(file_remote, file_local)
 
-            except Exception, e:
+            except Exception as e:
                 # cleanup and terminate
                 rmtree(directory)
                 raise Exception('Unable to download image {} to location {}. Error: {}'.format(file_remote, file_local, e))
